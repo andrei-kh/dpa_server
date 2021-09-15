@@ -1,0 +1,33 @@
+html {
+    font-family: "mononoki NF";
+}
+
+body {
+    background-color: #292a2b;
+    text-align: center;
+}
+
+div {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+a.login_text {
+    color: #d8dfda;
+    text-decoration: none;
+}
+
+a.info_text {
+    color: #c12a36;
+    text-decoration: none;
+}
+
+span.hello {
+    color: #ea994b;
+}
+
+span.user {
+    color: #23c5c4;
+}
