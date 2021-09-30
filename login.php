@@ -21,7 +21,7 @@ if (isset($_GET["error"])) {
     } elseif ($_GET["error"] == "wrong_password") {
         $password_valid = "is-invalid";
         $password_error = "Wrong password. Try again.";
-    } elseif ($_GET["error"] == "stmt_prepare_error" || $_GET["error"] == "stmt_execute_error") {
+    } elseif ($_GET["error"] == "db_error") {
         $stmt_error = "There are some problems.<br> Please try again later.";
     }
 }

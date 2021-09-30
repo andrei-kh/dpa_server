@@ -20,10 +20,15 @@ if (isset($_POST["submit"])) {
 
     require_once "include/connect.inc.php";
 
-    if (userExists($connection, $username, "../register.php"))
-        errorMessage("../register.php", "user_exists");
+    $error = createUser($write_conn, $username, $password, $name);
 
-    createUser($connection, $username, $password, $name);
+    if (isset($error))
+        errorMessage("../register.php", $error);
+    else{
+        loginUser($read_conn, $username, $password);
+        errorMessage("../index.php");
+    }
+
 } else {
     errorMessage("../register.php");
 }

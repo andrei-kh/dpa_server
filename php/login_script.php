@@ -15,7 +15,12 @@ if (isset($_POST["submit"])) {
 
     require_once "include/connect.inc.php";
 
-    loginUser($connection, $username, $password);
+    $error = loginUser($read_conn, $username, $password);
+
+    if(isset($error))
+        errorMessage("../login.php", $error);
+    else
+        errorMessage("../index.php");
 }
 else{
     errorMessage("../login.php");

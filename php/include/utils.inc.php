@@ -34,23 +34,49 @@ function diffPasswords(string $pass1, string $pass2): bool
     return true;
 }
 
+function createUser(mysqli $conn, string $username, string $password, string $name): ?string
+{
+    $sql = "INSERT INTO users (username, password, name) VALUES (?, ?, ?);";
+    $stmt = mysqli_stmt_init($conn);
+
+    if (!mysqli_stmt_prepare($stmt, $sql))
+        return "db_error";
+
+    $h_password = password_hash($password, PASSWORD_DEFAULT);
+
+    mysqli_stmt_bind_param($stmt, "sss", $username, $h_password, $name);
+
+    if (!mysqli_stmt_execute($stmt))
+    {
+        switch (mysqli_errno($conn)) {
+            case 1062:
+                return "user_exists";
+            
+            default:
+                return "db_error";
+        }
+    }
+
+    mysqli_stmt_close($stmt);
+    
+    return null;
+}
+
 /**
  * @return array|bool 
  * false if user doesn't exist.
  * array of rows with $username as username otherwise.
  * */
-function userExists(mysqli $conn, string $username, string $location): array | bool
+function userExists(mysqli $conn, string $username): array | bool
 {
     $sql = "SELECT * FROM users WHERE username = ?;";
     $stmt = mysqli_stmt_init($conn);
 
-    if (!mysqli_stmt_prepare($stmt, $sql))
-        errorMessage($location, "stmt_prepare_error");
+    mysqli_stmt_prepare($stmt, $sql);
 
     mysqli_stmt_bind_param($stmt, "s", $username);
 
-    if (!mysqli_stmt_execute($stmt))
-        errorMessage($location, "stmt_execute_error");
+    mysqli_stmt_execute($stmt);
 
     $res = mysqli_stmt_get_result($stmt);
 
@@ -62,32 +88,16 @@ function userExists(mysqli $conn, string $username, string $location): array | b
     return false;
 }
 
-function createUser(mysqli $conn, string $username, string $password, string $name): void
+function loginUser(mysqli $conn, string $username, string $password): ?string
 {
-    $sql = "INSERT INTO users (username, password, name) VALUES (?, ?, ?);";
-    $stmt = mysqli_stmt_init($conn);
-
-    if (!mysqli_stmt_prepare($stmt, $sql))
-        errorMessage("../register.php", "stmt_prepare_error");
-
-    $h_password = password_hash($password, PASSWORD_DEFAULT);
-
-    mysqli_stmt_bind_param($stmt, "sss", $username, $h_password, $name);
-
-    if (!mysqli_stmt_execute($stmt))
-        errorMessage("../register.php", "stmt_execute_error");
-
-    mysqli_stmt_close($stmt);
-
-    loginUser($conn, $username, $password);
-}
-
-function loginUser(mysqli $conn, string $username, string $password): void
-{
-    $usernameExists = userExists($conn, $username, "../login.php");
+    try {
+        $usernameExists = userExists($conn, $username);
+    } catch (\Throwable $e) {
+        return "db_error";
+    }
 
     if ($usernameExists === false)
-        errorMessage("../login.php", "wrong_username");
+        return "wrong_username";
 
     $h_password = $usernameExists["password"];
 
@@ -96,8 +106,9 @@ function loginUser(mysqli $conn, string $username, string $password): void
         $_SESSION["id"] = $usernameExists["id"];
         $_SESSION["username"] = $usernameExists["username"];
         $_SESSION["name"] = $usernameExists["name"];
-        errorMessage("../index.php");
     } else {
-        errorMessage("../login.php", "wrong_password");
+        return "wrong_password";
     }
+
+    return null;
 }

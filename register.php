@@ -21,7 +21,7 @@ if (isset($_GET["error"])) {
     } elseif ($_GET["error"] == "user_exists") {
         $username_valid = "is-invalid";
         $username_error = "User with that username already exists.";
-    } elseif ($_GET["error"] == "stmt_prepare_error" || $_GET["error"] == "stmt_execute_error") {
+    } elseif ($_GET["error"] == "db_error") {
         $stmt_error = "There are some problems.<br> Please try again later.";
     }
 }
