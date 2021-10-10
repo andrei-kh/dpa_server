@@ -34,81 +34,36 @@ function diffPasswords(string $pass1, string $pass2): bool
     return true;
 }
 
-function createUser(mysqli $conn, string $username, string $password, string $name): ?string
+function set_session(string $key, string $value): void
 {
-    $sql = "INSERT INTO users (username, password, name) VALUES (?, ?, ?);";
-    $stmt = mysqli_stmt_init($conn);
-
-    if (!mysqli_stmt_prepare($stmt, $sql))
-        return "db_error";
-
-    $h_password = password_hash($password, PASSWORD_DEFAULT);
-
-    mysqli_stmt_bind_param($stmt, "sss", $username, $h_password, $name);
-
-    if (!mysqli_stmt_execute($stmt))
-    {
-        switch (mysqli_errno($conn)) {
-            case 1062:
-                return "user_exists";
-            
-            default:
-                return "db_error";
-        }
-    }
-
-    mysqli_stmt_close($stmt);
-    
-    return null;
+    session_start();
+    $_SESSION[$key] = $value;
 }
 
-/**
- * @return array|bool 
- * false if user doesn't exist.
- * array of rows with $username as username otherwise.
- * */
-function userExists(mysqli $conn, string $username): array | bool
+function get_session(string $key)
 {
-    $sql = "SELECT * FROM users WHERE username = ?;";
-    $stmt = mysqli_stmt_init($conn);
-
-    mysqli_stmt_prepare($stmt, $sql);
-
-    mysqli_stmt_bind_param($stmt, "s", $username);
-
-    mysqli_stmt_execute($stmt);
-
-    $res = mysqli_stmt_get_result($stmt);
-
-    mysqli_stmt_close($stmt);
-
-    if ($row = mysqli_fetch_assoc($res))
-        return $row;
-
+    session_start();
+    if (isset($key) && isset($_SESSION[$key]))
+        return $_SESSION[$key];
     return false;
 }
 
-function loginUser(mysqli $conn, string $username, string $password): ?string
+function hex2RGB($hexStr)
 {
-    try {
-        $usernameExists = userExists($conn, $username);
-    } catch (\Throwable $e) {
-        return "db_error";
-    }
+    $hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $hexStr);
+    $rgbArray = array();
 
-    if ($usernameExists === false)
-        return "wrong_username";
+    $colorVal = hexdec($hexStr);
+    $rgbArray['red'] = 0xFF & ($colorVal >> 0x10);
+    $rgbArray['green'] = 0xFF & ($colorVal >> 0x8);
+    $rgbArray['blue'] = 0xFF & $colorVal;
 
-    $h_password = $usernameExists["password"];
+    return $rgbArray;
+}
 
-    if (password_verify($password, $h_password)) {
-        session_start();
-        $_SESSION["id"] = $usernameExists["id"];
-        $_SESSION["username"] = $usernameExists["username"];
-        $_SESSION["name"] = $usernameExists["name"];
-    } else {
-        return "wrong_password";
-    }
+function valid_captcha($code): bool
+{
+    $valid_code = get_session("captcha");
 
-    return null;
+    return $valid_code == $code;
 }

@@ -1,7 +1,6 @@
 <?php
 require_once "php/include/utils.inc.php";
-session_start();
-if (isset($_SESSION["id"]))
+if (get_session("id"))
     errorMessage("index.php");
 ?>
 
@@ -32,22 +31,13 @@ if (isset($_GET["error"])) {
 
 <head>
     <title>Login</title>
+
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .wrapper {
-            font-family: "mononoki NF";
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 420px;
-            padding: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="login_wrapper">
         <h2>Login</h2>
         <p>Please fill in your credentials to login.</p>
         <form action="php/login_script.php" method="POST">
@@ -61,14 +51,14 @@ if (isset($_GET["error"])) {
                 <input type="password" name="password" class="form-control <?php echo $password_valid ?>">
                 <div class="invalid-feedback"><?php echo $password_error ?></div>
             </div>
-            <p>
-            <div class="form-group">
+            <div class="form-group form-no-label">
                 <button type="submit" class="btn btn-secondary" name="submit">Login</button>
             </div>
-            </p>
-            <p>Don't have an account? <a href="register.php">Register now</a>.</p>
+            <div class="form-group form-no-label">
+                Don't have an account? <a href="register.php">Register now</a>.
+                <p class="text-warning"><?php echo $stmt_error; ?></p>
+            </div>
         </form>
-        <p class="text-warning"><?php echo $stmt_error; ?></p>
     </div>
 </body>
 

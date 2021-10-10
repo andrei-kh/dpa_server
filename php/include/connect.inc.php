@@ -1,15 +1,30 @@
 <?php
-define('DB_SERVER', get_cfg_var("dpa_server.cfg.DB_SERVER"));
-define('DB_NAME', get_cfg_var("dpa_server.cfg.DB_NAME"));
-define('DB_READER_USER', get_cfg_var("dpa_server.cfg.DB_READER_USER"));
-define('DB_READER_PASS', get_cfg_var("dpa_server.cfg.DB_READER_PASS"));
-define('DB_WRITER_USER', get_cfg_var("dpa_server.cfg.DB_WRITER_USER"));
-define('DB_WRITER_PASS', get_cfg_var("dpa_server.cfg.DB_WRITER_PASS"));
+function reader_connect(): mysqli
+{
+    $db_server = get_cfg_var("dpa_server.cfg.DB_SERVER");
+    $db_name = get_cfg_var("dpa_server.cfg.DB_NAME");
+    $db_reader_user = get_cfg_var("dpa_server.cfg.DB_READER_USER");
+    $db_reader_pass = get_cfg_var("dpa_server.cfg.DB_READER_PASS");
 
-$read_conn = mysqli_connect(DB_SERVER, DB_READER_USER, DB_READER_PASS, DB_NAME);
-$write_conn = mysqli_connect(DB_SERVER, DB_WRITER_USER, DB_WRITER_PASS, DB_NAME);
+    $read_conn = mysqli_connect($db_server, $db_reader_user, $db_reader_pass, $db_name);
 
-if ($read_conn == false || $write_conn == false) {
-    die("Connection failed: " . mysqli_connect_error());
+    if ($read_conn == false)
+        die("Connection failed: " . mysqli_connect_error());
+
+    return $read_conn;
 }
 
+function writer_connect(): mysqli
+{
+    $db_server = get_cfg_var("dpa_server.cfg.DB_SERVER");
+    $db_name = get_cfg_var("dpa_server.cfg.DB_NAME");
+    $db_writer_user = get_cfg_var("dpa_server.cfg.DB_WRITER_USER");
+    $db_writer_pass = get_cfg_var("dpa_server.cfg.DB_WRITER_PASS");
+
+    $write_conn = mysqli_connect($db_server, $db_writer_user, $db_writer_pass, $db_name);
+
+    if ($write_conn == false)
+        die("Connection failed: " . mysqli_connect_error());
+
+    return $write_conn;
+}

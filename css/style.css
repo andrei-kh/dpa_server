@@ -1,33 +1,61 @@
-html {
-    font-family: "mononoki NF";
+:root {
+    --main-font: "mononoki NF";
+    --orange: #ea994b;
+    --red: #c12a36;
+    --indigo: #23c5c4;
+    --white: #d8dfda;
+    --black: #242424;
 }
 
 body {
-    background-color: #292a2b;
-    text-align: center;
+    font-family: var(--main-font);
+    background-color: var(--black);
 }
 
-div {
+div.index_wrapper {
+    text-align: center;
     position: absolute;
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
+div.login_wrapper {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    padding: 20px;
+}
+
+div.register_wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    padding: 20px;
+}
+
 a.login_text {
-    color: #d8dfda;
+    color: var(--white);
     text-decoration: none;
 }
 
 a.info_text {
-    color: #c12a36;
+    color: var(--red);
     text-decoration: none;
 }
 
 span.hello {
-    color: #ea994b;
+    color: var(--orange);
 }
 
 span.user {
-    color: #23c5c4;
+    color: var(--indigo);
+}
+
+.form-no-label {
+    margin-top: 10px;
 }

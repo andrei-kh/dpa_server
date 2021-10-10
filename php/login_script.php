@@ -1,10 +1,11 @@
 <?php
-
 require_once "include/utils.inc.php";
+require_once "include/db.inc.php";
+require_once "include/connect.inc.php";
 
 if (isset($_POST["submit"])) {
-    $username = trim($_POST["username"]);
-    $password = trim($_POST["password"]);
+    $username = $_POST["username"];
+    $password = $_POST["password"];
 
 
     if (areEmpty($username, $password))
@@ -13,15 +14,13 @@ if (isset($_POST["submit"])) {
     if (invalidUsername($username))
         errorMessage("../login.php", "invalid_username");
 
-    require_once "include/connect.inc.php";
-
+    $read_conn = reader_connect();
     $error = loginUser($read_conn, $username, $password);
 
-    if(isset($error))
+    if (isset($error))
         errorMessage("../login.php", $error);
     else
         errorMessage("../index.php");
-}
-else{
+} else {
     errorMessage("../login.php");
 }
