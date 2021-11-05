@@ -70,7 +70,7 @@ class Captcha
     function render_captcha(): void
     {
         $captcha_code = $this->get_code();
-        set_session('captcha', $captcha_code);
+        set_session(['captcha' => $captcha_code]);
         $image = $this->create_image($captcha_code, $this->width, $this->height);
 
         header("Content-type: image/jpeg");

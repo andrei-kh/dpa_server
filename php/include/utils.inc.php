@@ -6,7 +6,7 @@ function errorMessage(string $location, string $error = ""): void
 {
     $location = "location: " . $location;
     if (!empty($error))
-        $location .= "?error=" . $error;
+        set_session(['error' => $error]);
     header($location);
     exit();
 }
@@ -34,18 +34,35 @@ function diffPasswords(string $pass1, string $pass2): bool
     return true;
 }
 
-function set_session(string $key, string $value): void
+function set_session(array $values): void
 {
-    session_start();
-    $_SESSION[$key] = $value;
+    if (!isset($_SESSION)) {
+        session_start();
+    }
+    foreach ($values as $key => $value) {
+        $_SESSION[$key] = $value;
+    }
 }
 
 function get_session(string $key)
 {
-    session_start();
-    if (isset($key) && isset($_SESSION[$key]))
-        return $_SESSION[$key];
+    if (!isset($_SESSION)) {
+        session_start();
+    }
+    if (isset($key) && isset($_SESSION[$key])) {
+        $result = $_SESSION[$key];
+        return $result;
+    }
     return false;
+}
+
+function unset_session(string $key): void
+{
+    if (!isset($_SESSION)) {
+        session_start();
+    }
+    if (isset($key))
+        unset($_SESSION[$key]);
 }
 
 function hex2RGB($hexStr)
@@ -66,4 +83,45 @@ function valid_captcha($code): bool
     $valid_code = get_session("captcha");
 
     return $valid_code == $code;
+}
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once 'PHPMailer/src/Exception.php';
+require_once 'PHPMailer/src/PHPMailer.php';
+require_once 'PHPMailer/src/SMTP.php';
+
+
+function send_verification_email(string $email, string $name, string $token): void
+{
+    $mail_vars = array('name' => $name, 'token' => $token);
+
+    $message = file_get_contents(__DIR__ . "/../../html/verification_email_template.html", true);
+
+    foreach ($mail_vars as $key => $value) {
+        $message = str_replace('{{ ' . $key . ' }}', $value, $message);
+    }
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->SMTPAuth = true;
+        $mail->SMTPSecure = "ssl";
+        $mail->Host = "smtp.gmail.com";
+        $mail->Port = 465;
+
+        $mail->Username = get_cfg_var("dpa_server.cfg.EMAIL_USERNAME");;
+        $mail->Password = get_cfg_var("dpa_server.cfg.EMAIL_PASSWORD");;
+
+        $mail->setFrom($mail->Username);
+        $mail->addAddress($email);
+        $mail->isHTML(true);
+        $mail->Subject = "Email Verification";
+        $mail->Body = $message;
+
+        $mail->send();
+    } catch (Exception $ex) {
+        echo $ex->getMessage();
+    }
 }

@@ -12,6 +12,7 @@ if (isset($_POST["submit"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $password_conf = $_POST["password_conf"];
+    $email = $_POST["email"];
     $name = $_POST["name"];
     
     if (areEmpty($username, $password, $password_conf, $name))
@@ -23,8 +24,11 @@ if (isset($_POST["submit"])) {
     if (diffPasswords($password, $password_conf))
         errorMessage("../register.php", "different_passwords");
 
+    if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+        errorMessage("../register.php", 'invalid_email');
+
     $write_conn = writer_connect();
-    $error = createUser($write_conn, $username, $password, $name);
+    $error = createUser($write_conn, $username, $password, $email, $name);
 
     if (isset($error))
         errorMessage("../register.php", $error);

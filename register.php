@@ -7,25 +7,41 @@ if (get_session("id"))
 <?php
 $username_valid = $password_valid = $name_valid = "";
 $username_error = $password_error = $name_error = $stmt_error = "";
-if (isset($_GET["error"])) {
-    if ($_GET["error"] == "empty_input") {
-        $username_valid = $password_valid = $name_valid = "is-invalid";
-        $username_error = $password_error = $name_error = "Fields can't be empty.";
-    } elseif ($_GET["error"] == "invalid_username") {
-        $username_valid = "is-invalid";
-        $username_error = "Invalid username. Usernames can only contain letters, numbers and underscores.";
-    } elseif ($_GET["error"] == "different_passwords") {
-        $password_valid = "is-invalid";
-        $password_error = "Passwords don't match.";
-    } elseif ($_GET["error"] == "user_exists") {
-        $username_valid = "is-invalid";
-        $username_error = "User with that username already exists.";
-    } elseif ($_GET["error"] == "invalid_captcha") {
-        $captcha_valid = "is-invalid";
-        $captcha_error = "User with that username already exists.";
-    } elseif ($_GET["error"] == "db_error") {
-        $stmt_error = "There are some problems.<br> Please try again later.";
+if (get_session("error")) {
+    switch (get_session("error")) {
+        case "empty_input":
+            $username_valid = $password_valid = $name_valid = $email_valid = "is-invalid";
+            $username_error = $password_error = $name_error = $email_error = "Fields can't be empty.";
+            break;
+        case "invalid_username":
+            $username_valid = "is-invalid";
+            $username_error = "Invalid username. Usernames can only contain letters, numbers and underscores.";
+            break;
+        case "different_passwords":
+            $password_valid = "is-invalid";
+            $password_error = "Passwords don't match.";
+            break;
+        case "username_exists":
+            $username_valid = "is-invalid";
+            $username_error = "User with that username already exists.";
+            break;
+        case "invalid_email":
+            $email_valid = "is-invalid";
+            $email_error = "Invalid e-mail address.";
+            break;
+        case "email_exists":
+            $email_valid = "is-invalid";
+            $email_error = "User with that email already exists.";
+            break;
+        case "invalid_captcha":
+            $captcha_valid = "is-invalid";
+            $captcha_error = "Captcha is incorrect.";
+            break;
+        case "db_error":
+            $stmt_error = "There are some problems.<br> Please try again later.";
+            break;
     }
+    unset_session('error');
 }
 ?>
 
@@ -43,25 +59,31 @@ if (isset($_GET["error"])) {
     <div class="register_wrapper">
         <h2>Register</h2>
         <p>Please fill in your credentials to login.</p>
-        <form action="php/register_script.php" method="POST">
+        <form action="php/register_script.php" method="POST" autocomplete="off">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" class="form-control <?php echo $username_valid ?>">
-                <div class="invalid-feedback"><?php echo $username_error ?></div>
+                <input type="text" name="username" class="form-control <?php echo $username_valid; ?>">
+                <div class="invalid-feedback"><?php echo $username_error; ?></div>
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" class="form-control <?php echo $password_valid ?>">
-                <div class="invalid-feedback"><?php echo $password_error ?></div>
+                <input type="password" name="password" class="form-control <?php echo $password_valid; ?>">
+                <div class="invalid-feedback"><?php echo $password_error; ?></div>
             </div>
             <div class="form-group">
                 <label>Password confirmation</label>
-                <input type="password" name="password_conf" class="form-control <?php echo $password_valid ?>">
-                <div class="invalid-feedback"><?php echo $password_error ?></div>
+                <input type="password" name="password_conf" class="form-control <?php echo $password_valid; ?>">
+                <div class="invalid-feedback"><?php echo $password_error; ?></div>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control <?php echo $email_valid; ?>">
+                <div class="invalid-feedback"><?php echo $email_error; ?></div>
             </div>
             <div class="form-group">
                 <label>Name</label>
-                <input type="text" name="name" class="form-control">
+                <input type="text" name="name" class="form-control <?php echo $name_valid; ?>">
+                <div class="invalid-feedback"><?php echo $name_error; ?></div>
             </div>
             <div class="form-group form-no-label">
                 <div class="row">
@@ -70,9 +92,9 @@ if (isset($_GET["error"])) {
                     </div>
                     <div class="col-8 align-items-center">
                         <div class="form-floating">
-                            <input type="text" name="captcha" class="form-control <?php echo $captcha_valid ?>" placeholder="Captcha">
+                            <input type="text" name="captcha" class="form-control <?php echo $captcha_valid; ?>" placeholder="Captcha">
                             <label for="captcha">Captcha</label>
-                            <div class="invalid-feedback"><?php echo $captcha_error ?></div>
+                            <div class="invalid-feedback"><?php echo $captcha_error; ?></div>
                         </div>
                     </div>
                 </div>
